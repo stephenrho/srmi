@@ -41,6 +41,82 @@ codes_tab <- function(..., sep = ", "){
 # todo: re-list results of codes_tab
 
 
+#' Convert 10 digit NDCs to 11 digit
+#'
+#' @param x a 10 digit NDC code (character) with dashes "-". Should be 4-4-2, 5-3-2, or 5-4-1.
+#'
+#' @returns 11 digit NDC
+#' @export
+ndc10to11 <- function(x){
+
+  stopifnot(length(x)==1)
+
+  code = strsplit(x, split = "-")[[1]]
+  if (length(code) != 3){
+    stop("problem with: ", x)
+  }
+  chars = nchar(code)
+  if (sum(chars) == 11){
+    out = paste0(code, collapse = "")
+  } else{
+    if (all(chars == c(5, 3, 2))){
+      out = paste0(code[1], "0", code[2], code[3])
+    } else if (all(chars == c(4, 4, 2))){
+      out = paste0("0", code[1], code[2], code[3])
+    } else if (all(chars == c(5, 4, 1))){
+      out = paste0(code[1], code[2], "0", code[3])
+    } else{
+      stop("pattern of characters not recognized: ", x,
+           "\nShould be 4-4-2, 5-3-2, or 5-4-1")
+    }
+  }
+  return(out)
+}
+
+### addleading0 -----
+addleading0 <- function(x, corlen=5){
+  nc <- nchar(x)
+  if (any(nc > corlen)) stop("one (or more) strings are > corlen")
+  z <- sapply(nc, function(xx) paste0(rep("0", corlen - xx), collapse = ""))
+  paste0(z, x)
+}
+
+
+## atable ----
+
+#' Customize atable numeric
+#'
+#' @param x numeric
+#'
+#' @returns median (IQR), mean (SD)
+#' @export
+medIQR = function(x){
+
+  q = unname(quantile(x, probs = c(.25, .5, .75), na.rm=T))
+  out = list("Mean (SD)" = sprintf("%.1f (%.1f)", mean(x, na.rm = T), sd(x, na.rm = T)),
+             "Median (IQR)" = sprintf("%.1f (%.1f, %.1f)", q[2], q[1], q[3]),
+             "missing" = sum(is.na(x)))
+
+  if (any(is.na(x))){
+    out
+  } else{
+    out[-3]
+  }
+}
+
+#' Customize atable factor
+#'
+#' @param x factor
+#'
+#' @returns counts (+ missing if any)
+#' @export
+statsFac = function(x){
+  statistics_out <- table(x, useNA = "ifany")
+  statistics_out <- as.list(statistics_out)
+  class(statistics_out) <- c("statistics_factor", "list")
+  return(statistics_out)
+}
+
 ### NIS ------
 
 #' Get NIS file specifications
