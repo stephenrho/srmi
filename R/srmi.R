@@ -1,4 +1,6 @@
 
+### misc ----
+
 #' Make a table of ICD/CPT/etc codes from lists
 #'
 #' @param ... lists of codes used to identify different diagnoses, procedures, etc.
@@ -39,9 +41,7 @@ codes_tab <- function(..., sep = ", "){
 # todo: re-list results of codes_tab
 
 
-
-
-## NIS ------
+### NIS ------
 
 #' Get NIS file specifications
 #'
@@ -123,8 +123,15 @@ load_nis <- function(year, file = c("Core", "Hospital", "Severity"),
   as.data.frame(d)
 }
 
-## openFDA ----
+### openFDA ----
 
+#' Query openFDA by drug name
+#'
+#' @param dname drug name (generic)
+#' @param route optional route of administration
+#'
+#' @returns data.frame of results for processing by other functions
+#' @export
 query_fda <- function(dname, route){
   dname <- gsub(" ", "%", dname)
   dname <- sprintf('"%s"', dname) # enclose in quotes
@@ -145,11 +152,33 @@ query_fda <- function(dname, route){
   }
 }
 
+#' Query openFDA for vector of drug names
+#'
+#' @param druglist list of drug names (this is a wrapper for query_fda). See example
+#' @param route optional route of administration (same for all in druglist)
+#'
+#' @returns list of results
+#' @export
+#'
+#' @examples
+#' get_fda(list("oxybutynin" = "oxybutynin"), route = NULL) # |> get_ndc()
+#' # more than one generic name could be provided in the list
+#' # (e.g. list("global_name" = c("name1", "name2")))
 get_fda <- function(druglist, route=NULL){
   lapply(druglist, \(x) lapply(x, query_fda, route=route))
 }
 
+#' Extract NDCs from results of get_fda
+#'
+#' @param fda output from get_fda
+#'
+#' @returns list of NDCs
+#' @export
+#' @examples
+#' get_fda(list("oxybutynin" = "oxybutynin"), route = NULL) |>
+#' get_ndc()
 get_ndc <- function(fda){
+
   lapply(fda, \(x) sapply(x, \(xx){
     if ("packaging" %in% names(xx)){
       sapply(xx$packaging, \(xxx) xxx$package_ndc) |>
@@ -162,7 +191,18 @@ get_ndc <- function(fda){
   )
 }
 
+
+#' Extract RxCUI from results of get_fda
+#'
+#' @param fda output from get_fda
+#'
+#' @returns list of RxCUI
+#' @export
+#' @examples
+#' get_fda(list("oxybutynin" = "oxybutynin"), route = NULL) |>
+#' get_rxcui()
 get_rxcui <- function(fda){
+
   lapply(fda, \(x) sapply(x, \(xx){
     if ("openfda" %in% names(xx)){
       xx$openfda$rxcui |>
