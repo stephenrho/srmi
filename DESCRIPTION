@@ -1,6 +1,6 @@
 Package: srmi
 Type: Package
-Title: Misc Functions I (Stephen Rhodes) Sometimes Use
+Title: Misc Functions I Sometimes Use
 Version: 0.1.0
 Authors@R: c(
     person(
@@ -13,4 +13,4 @@ Description: Functions I find useful for my job
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2

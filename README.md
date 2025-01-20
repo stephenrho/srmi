@@ -1,1 +1,1 @@
-# Misc Functions I (Stephen Rhodes) Sometimes Use
+# Misc Functions I Sometimes Use
