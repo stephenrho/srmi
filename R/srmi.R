@@ -81,6 +81,55 @@ addleading0 <- function(x, corlen=5){
   paste0(z, x)
 }
 
+#' extract times from pasted cells
+#'
+#' @param x column of times pasted together ("-1 | 0 | 1")
+#' @param lower min value of interest
+#' @param upper max value of interest
+#' @param extract between = any values in x between lower and upper, min/max = the lowest or largest number between lower and upper
+#' @param sep character separating times in x
+#'
+#' @returns vector of T/F or min/max times (if any)
+#' @export
+extract_time <- function(x, lower, upper, extract = c("between", "min", "max"), sep="\\|"){
+  if (is.numeric(x)) x <- as.character(x)
+
+  extract <- match.arg(extract)
+
+  any_in_range = function(x, lower, upper){
+    out = any(data.table::between(as.numeric(x), lower = lower, upper = upper))
+    if (is.na(out)){
+      out = F
+    }
+    out
+  }
+
+  min2 = function(x) if (all(is.na(x))) NA else min(x, na.rm = T)
+  max2 = function(x) if (all(is.na(x))) NA else max(x, na.rm = T)
+
+  if (extract == "between"){
+    f <- any_in_range
+  } else if (extract == "min"){
+    f <- function(x, lower, upper){
+      x <- as.numeric(x); x <- na.omit(x)
+      #x <- x[data.table::between(x, lower = lower, upper = upper)]
+      x <- x[x >= lower & x <= upper]
+      min2(x)
+    }
+  } else if (extract == "max"){
+    f <- function(x, lower, upper){
+      x <- as.numeric(x); x <- na.omit(x)
+      #x <- x[data.table::between(x, lower = lower, upper = upper)]
+      x <- x[x >= lower & x <= upper]
+      max2(x)
+    }
+  }
+  if (!is.character(x) | all(is.na(x))){
+    rep(NA, length(x))
+  } else{
+    sapply(strsplit(x, split = sep), f, lower = lower, upper = upper)
+  }
+}
 
 ## atable ----
 

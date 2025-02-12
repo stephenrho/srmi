@@ -4,10 +4,12 @@
 \alias{children}
 \title{Find children (sub-codes) of ICD9/10 codes using `icd.data`}
 \usage{
-children(x, format = c("short", "decimal"), unlist = FALSE)
+children(x, version, format = c("short", "decimal"), unlist = FALSE)
 }
 \arguments{
 \item{x}{vector of ICD9 or 10 diagnosis codes (will guess based on starting character)}
+
+\item{version}{9 or 10. Guessed if missing}
 
 \item{format}{of the returned codes (short or decimal)}
 
@@ -17,5 +19,6 @@ children(x, format = c("short", "decimal"), unlist = FALSE)
 a list or vector of subcodes
 }
 \description{
-Find children (sub-codes) of ICD9/10 codes using `icd.data`
+If providing decimal codes please include decimal even if there are no
+following digits (e.g. "E11.", "188.").
 }
