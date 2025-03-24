@@ -3,6 +3,7 @@
 export(children)
 export(codes_tab)
 export(extract_time)
+export(fill)
 export(get_fda)
 export(get_ndc)
 export(get_rxcui)

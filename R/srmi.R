@@ -30,6 +30,28 @@ codes_tab <- function(..., sep = ", "){
   return(tab)
 }
 
+#' fill up or down
+#'
+#' @param x vector with missing entries
+#' @param direction fill up or down
+#'
+#' @returns vector with elements filled in
+#' @export
+fill <- function(x, direction = c("down", "up")){
+  direction <- match.arg(direction)
+  if (direction == "up"){
+    x <- rev(x)
+  }
+  for (i in seq(x)){
+    if (i == 1 & is.na(x[i])) next
+    if (is.na(x[i])) x[i] <- x[i-1]
+  }
+  if (direction == "up"){
+    x <- rev(x)
+  }
+  x
+}
+
 # codes = list(A = list(a = c('123','456','789'), b = c('1011', '1213')),
 #              B = list(a = c("A12", "B13"), c = "123"),
 #              C = list(b = "2343", d = c('1', '2'))

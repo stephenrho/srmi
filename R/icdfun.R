@@ -119,7 +119,8 @@ children <- function(x, version, format = c("short", "decimal"), unlist=FALSE){
   }
 
   if (version == 10){
-    ml <- icd.data::icd10cm2016
+    #ml <- icd.data::icd10cm2016
+    ml <- icd10_april2025
     conv <- icd10_convert
   } else if (version == 9){
     ml <- icd.data::icd9cm_hierarchy
