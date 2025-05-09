@@ -153,6 +153,78 @@ extract_time <- function(x, lower, upper, extract = c("between", "min", "max"), 
   }
 }
 
+#' Convert to factor with levels ordered by frequency
+#'
+#' @param x vector of values (preferably character)
+#' @param decreasing TRUE (default) = factor levels in decreasing order of frequency, FALSE = increasing
+#'
+#' @returns factor with levels in order of frequency
+#' @export
+factorn <- function(x, decreasing = TRUE){
+
+  if (!is.character(x)){
+    message("converting x to character")
+    x <- as.character(x)
+  }
+  f <- table(x)
+  f <- f[order(f, decreasing = decreasing)]
+  factor(x, levels = names(f))
+}
+
+
+#' Paste order of events together
+#'
+#' @param data data.frame
+#' @param cols column names in data (numeric or NA). Columns must be numeric
+#' @param labels optional names to substitute for cols
+#' @param asfactor return factor (with levels ordered by count) or not
+#'
+#' @returns character vector of orders where x->y means y followed x and x=y means x
+#' and y co-occured.
+#' @export
+#'
+#' @examples
+#' d <- data.frame(x1 = c(-10, 0, NA), x2 = c(NA, -10, 30), x3 = c(10, 20, 30))
+#'
+#' srmi::mkorder(d, cols = colnames(d), labels = c("A", "B", "C"), asfactor = FALSE)
+mkorder <- function(data, cols, labels, asfactor=TRUE){
+
+  if (missing(labels)) labels <- cols
+
+  data <- as.data.frame(data)
+
+  mo <- function(x, labels){
+    l <- labels[!is.na(x)]
+    x <- x[!is.na(x)]
+    o <- order(x, na.last = T)
+    x <- x[o]
+    out <- l[o]
+
+    d <- ifelse(diff(x) == 0, "=", "->") # give an = if same day
+    out <- paste0(c(rbind(out, c(d, ""))), collapse="")
+    if (out == "")
+      NA
+    else
+      out
+  }
+
+  out <- apply(data[, cols], 1, mo, labels=labels)
+
+  if (asfactor){
+    # x <- table(out)
+    # l <- names(x[order(x, decreasing = TRUE)])
+    # factor(out, levels = l)
+    factorn(out)
+  } else{
+    out
+  }
+}
+
+# TODO:
+# mkorderpasted <- function(data, cols, labels, asfactor=TRUE){
+#
+# }
+
 ## atable ----
 
 #' Customize atable numeric
